@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-# Criar usuário admin dinamicamente
 echo "Configurando usuário admin no Tomcat..."
 
 cat > $CATALINA_HOME/conf/tomcat-users.xml <<EOF
@@ -14,14 +13,13 @@ cat > $CATALINA_HOME/conf/tomcat-users.xml <<EOF
 </tomcat-users>
 EOF
 
-# Liberar acesso remoto ao Manager e Host-Manager
 echo "Liberando acesso remoto..."
-sed -i '/Valve className="org.apache.catalina.valves.RemoteAddrValve"/,/\/Valve>/d' \
-    $CATALINA_HOME/webapps/manager/META-INF/context.xml || true
-sed -i '/Valve className="org.apache.catalina.valves.RemoteAddrValve"/,/\/Valve>/d' \
-    $CATALINA_HOME/webapps/host-manager/META-INF/context.xml || true
+for ctx in $CATALINA_HOME/webapps/manager/META-INF/context.xml $CATALINA_HOME/webapps/host-manager/META-INF/context.xml; do
+  if [ -f "$ctx" ]; then
+    sed -i '/Valve className="org.apache.catalina.valves.RemoteAddrValve"/,/\/Valve>/d' "$ctx"
+  fi
+done
 
-# Exibir credenciais no log
 echo "===================================================="
 echo "Tomcat iniciado com sucesso!"
 echo "Acesse: http://localhost:8080/manager/html"
@@ -29,5 +27,4 @@ echo "Usuário: ${TOMCAT_USER}"
 echo "Senha:   ${TOMCAT_PASS}"
 echo "===================================================="
 
-# Iniciar Tomcat no foreground
 exec $CATALINA_HOME/bin/catalina.sh run
