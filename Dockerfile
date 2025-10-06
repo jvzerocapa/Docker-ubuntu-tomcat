@@ -22,11 +22,11 @@ RUN curl -fSL https://downloads.apache.org/tomcat/tomcat-10/v$TOMCAT_VERSION/bin
     && rm tomcat.tar.gz
 
 # Habilitar Manager GUI
-RUN echo "<tomcat-users>\n\
-  <role rolename=\"manager-gui\"/>\n\
-  <role rolename=\"admin-gui\"/>\n\
-  <user username=\"admin\" password=\"admin123\" roles=\"manager-gui,admin-gui\"/>\n\
-</tomcat-users>" > $CATALINA_HOME/conf/tomcat-users.xml
+#RUN echo "<tomcat-users>\n\
+ # <role rolename=\"manager-gui\"/>\n\
+  #<role rolename=\"admin-gui\"/>\n\
+  #<user username=\"admin\" password=\"admin123\" roles=\"manager-gui,admin-gui\"/>\n\
+#</tomcat-users>" > $CATALINA_HOME/conf/tomcat-users.xml
 
 # Copiar entrypoint
 COPY entrypoint.sh /entrypoint.sh
