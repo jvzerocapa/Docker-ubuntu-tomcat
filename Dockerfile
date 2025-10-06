@@ -1,4 +1,4 @@
-# Usando Ubuntu como base
+# Base Ubuntu
 FROM ubuntu:22.04
 
 # Variáveis de ambiente
@@ -21,22 +21,17 @@ RUN curl -fSL https://downloads.apache.org/tomcat/tomcat-10/v$TOMCAT_VERSION/bin
     && mv apache-tomcat-$TOMCAT_VERSION $CATALINA_HOME \
     && rm tomcat.tar.gz
 
-# Habilitar Manager GUI
-RUN echo "<tomcat-users>
-  <role rolename=\"manager-gui\"/>
-  <role rolename=\"admin-gui\"/>
-  <user username=\"admin\" password=\"admin123\" roles=\"manager-gui,admin-gui\"/>
-</tomcat-users>" > $CATALINA_HOME/conf/tomcat-users.xml
+# Copiar tomcat-users.xml
+COPY tomcat-users.xml $CATALINA_HOME/conf/tomcat-users.xml
 
 # Copiar entrypoint
 COPY entrypoint.sh /entrypoint.sh
-RUN dos2unix /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh
 
-# Expor porta
-EXPOSE 80
+# Expor portas
 EXPOSE 8080
-EXPOSE 443
+EXPOSE 8009
+EXPOSE 8443
 
 # Entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
