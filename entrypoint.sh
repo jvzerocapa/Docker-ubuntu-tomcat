@@ -1,39 +1,33 @@
 #!/bin/bash
 set -e
 
-echo "=== Inicializando Tomcat ==="
+# Criar usuário admin dinamicamente
+echo "Configurando usuário admin no Tomcat..."
 
-TOMCAT_USERS_FILE="$CATALINA_HOME/conf/tomcat-users.xml"
-
-# Garante permissão total
-chmod -R 755 $CATALINA_HOME
-
-# Cria o usuário admin se não existir
-if ! grep -q 'username="admin"' "$TOMCAT_USERS_FILE"; then
-    echo "Criando usuário admin..."
-    cat <<EOL > "$TOMCAT_USERS_FILE"
+cat > $CATALINA_HOME/conf/tomcat-users.xml <<EOF
 <tomcat-users>
   <role rolename="manager-gui"/>
   <role rolename="manager-script"/>
   <role rolename="manager-status"/>
   <role rolename="admin-gui"/>
-  <user username="admin" password="admin123" roles="manager-gui,manager-script,manager-status,admin-gui"/>
+  <user username="${TOMCAT_USER}" password="${TOMCAT_PASS}" roles="manager-gui,manager-script,manager-status,admin-gui"/>
 </tomcat-users>
-EOL
-fi
+EOF
 
-# Aguardar extração do WAR
-echo "Aguardando extração dos WARs..."
-sleep 5
+# Liberar acesso remoto ao Manager e Host-Manager
+echo "Liberando acesso remoto..."
+sed -i '/Valve className="org.apache.catalina.valves.RemoteAddrValve"/,/\/Valve>/d' \
+    $CATALINA_HOME/webapps/manager/META-INF/context.xml || true
+sed -i '/Valve className="org.apache.catalina.valves.RemoteAddrValve"/,/\/Valve>/d' \
+    $CATALINA_HOME/webapps/host-manager/META-INF/context.xml || true
 
-# Remover restrição de IPs no manager e host-manager
-for app in manager host-manager; do
-    CONTEXT_FILE="$CATALINA_HOME/webapps/$app/META-INF/context.xml"
-    if [ -f "$CONTEXT_FILE" ]; then
-        echo "Liberando acesso remoto para $app..."
-        sed -i '/Valve className="org.apache.catalina.valves.RemoteAddrValve"/,/\/Valve>/d' "$CONTEXT_FILE"
-    fi
-done
+# Exibir credenciais no log
+echo "===================================================="
+echo "Tomcat iniciado com sucesso!"
+echo "Acesse: http://localhost:8080/manager/html"
+echo "Usuário: ${TOMCAT_USER}"
+echo "Senha:   ${TOMCAT_PASS}"
+echo "===================================================="
 
-echo "Iniciando servidor Tomcat..."
+# Iniciar Tomcat no foreground
 exec $CATALINA_HOME/bin/catalina.sh run
