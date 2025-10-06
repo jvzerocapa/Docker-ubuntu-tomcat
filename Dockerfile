@@ -33,7 +33,7 @@ COPY entrypoint.sh /entrypoint.sh
 RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh
 
 # Expor portas padrão
-EXPOSE 8080 8005 8009
+EXPOSE 8080 8005 8009 80
 
 # Entrypoint
 ENTRYPOINT ["/entrypoint.sh"]
