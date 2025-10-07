@@ -8,7 +8,7 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Expõe a porta padrão do Tomcat
-EXPOSE 8080
+EXPOSE 8080 80
 
 # Usa o entrypoint customizado
 ENTRYPOINT ["/entrypoint.sh"]
