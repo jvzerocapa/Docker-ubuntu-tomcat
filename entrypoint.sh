@@ -1,30 +1,39 @@
 #!/bin/bash
 set -e
 
-echo "Configurando usuário admin no Tomcat..."
+TOMCAT_HOME=/usr/local/tomcat
 
-cat > $CATALINA_HOME/conf/tomcat-users.xml <<EOF
-<tomcat-users>
+echo "🔧 Iniciando configuração do Tomcat..."
+
+# 1️⃣ Garante que os diretórios do manager e host-manager existam
+if [ ! -d "$TOMCAT_HOME/webapps/manager" ]; then
+    echo "📁 Copiando manager e host-manager padrão..."
+    cp -r $TOMCAT_HOME/webapps.dist/manager $TOMCAT_HOME/webapps/
+    cp -r $TOMCAT_HOME/webapps.dist/host-manager $TOMCAT_HOME/webapps/
+fi
+
+# 2️⃣ Cria o usuário admin com acesso total
+echo "👤 Criando usuário admin..."
+cat <<EOF > $TOMCAT_HOME/conf/tomcat-users.xml
+<tomcat-users xmlns="http://tomcat.apache.org/xml"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd"
+              version="1.0">
   <role rolename="manager-gui"/>
-  <role rolename="manager-script"/>
-  <role rolename="manager-status"/>
   <role rolename="admin-gui"/>
-  <user username="${TOMCAT_USER}" password="${TOMCAT_PASS}" roles="manager-gui,manager-script,manager-status,admin-gui"/>
+  <user username="admin" password="admin" roles="manager-gui,admin-gui"/>
 </tomcat-users>
 EOF
 
-echo "Liberando acesso remoto..."
-for ctx in $CATALINA_HOME/webapps/manager/META-INF/context.xml $CATALINA_HOME/webapps/host-manager/META-INF/context.xml; do
-  if [ -f "$ctx" ]; then
-    sed -i '/Valve className="org.apache.catalina.valves.RemoteAddrValve"/,/\/Valve>/d' "$ctx"
-  fi
+# 3️⃣ Libera acesso remoto aos apps manager e host-manager
+echo "🌐 Liberando acesso remoto..."
+for CTX in $TOMCAT_HOME/webapps/manager/META-INF/context.xml $TOMCAT_HOME/webapps/host-manager/META-INF/context.xml; do
+    if [ -f "$CTX" ]; then
+        # Remove linhas que bloqueiam acesso remoto
+        sed -i '/Valve className="org.apache.catalina.valves.RemoteAddrValve"/d' "$CTX"
+        sed -i '/allow="127\\\.0\\\.0\\\.1"/d' "$CTX"
+    fi
 done
 
-echo "===================================================="
-echo "Tomcat iniciado com sucesso!"
-echo "Acesse: http://localhost:8080/manager/html"
-echo "Usuário: ${TOMCAT_USER}"
-echo "Senha:   ${TOMCAT_PASS}"
-echo "===================================================="
-
-exec $CATALINA_HOME/bin/catalina.sh run
+echo "✅ Configuração concluída. Iniciando o Tomcat..."
+exec catalina.sh run
