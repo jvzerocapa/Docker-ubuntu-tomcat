@@ -25,19 +25,16 @@ docker run -d -p 80:8080 --name tomcat joaovitorgomes12/tomcatmanager:10.1-jdk17
 Opção 2: Buildar localmente
 Clone o repositório:
 
-bash
-Copiar código
+
 git clone https://github.com/jvzerocapa/Docker-ubuntu-tomcat.git
 cd Docker-ubuntu-tomcat
 Construa a imagem Docker:
 
-bash
-Copiar código
+
 docker build -t ubuntu-tomcat .
 Execute o contêiner:
 
-bash
-Copiar código
+
 docker run -d -p 80:8080 --name tomcat ubuntu-tomcat
 🌐 Acesso ao Tomcat
 Tomcat Manager: http://<host>/manager/html
