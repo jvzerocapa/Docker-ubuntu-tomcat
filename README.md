@@ -33,6 +33,7 @@ Inicia o Tomcat.
 ⚠️ Se você precisar usar outra versão do Tomcat ou Java, basta alterar a linha FROM tomcat:10.1-jdk17 no Dockerfile para a versão desejada.
 
 📦 Como Usar
+Opção 1 – Build manual da imagem
 
 Clone o repositório:
 
@@ -48,6 +49,13 @@ docker build -t ubuntu-tomcat .
 Execute o contêiner:
 
 docker run -d -p 8080:8080 --name tomcat ubuntu-tomcat
+
+Opção 2 – Usando imagem pronta do Docker Hub
+
+Você pode usar diretamente a imagem pronta no Docker Hub, sem precisar buildar:
+
+docker pull joaovitorgomes12/tomcatmanager:10.1-jdk17
+docker run -d -p 8080:8080 --name tomcat joaovitorgomes12/tomcatmanager:10.1-jdk17
 
 
 Acesse o Tomcat:
