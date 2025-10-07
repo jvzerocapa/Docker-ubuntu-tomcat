@@ -1,27 +1,14 @@
-FROM ubuntu:22.04
+# Usa imagem oficial estável do Tomcat 10 + Java 17
+FROM tomcat:10.1-jdk17
 
-ENV CATALINA_HOME=/usr/local/tomcat
-ENV PATH=$CATALINA_HOME/bin:$PATH
-ENV TOMCAT_VERSION=10.1.46
-ENV TOMCAT_USER=admin
-ENV TOMCAT_PASS=admin123
-
-RUN apt-get update && apt-get install -y \
-    curl \
-    openjdk-17-jdk \
-    dos2unix \
-    && rm -rf /var/lib/apt/lists/*
-
-# Instalar Tomcat
-RUN curl -fSL https://downloads.apache.org/tomcat/tomcat-10/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz -o /tmp/tomcat.tar.gz \
-    && tar -xzf /tmp/tomcat.tar.gz -C /opt \
-    && mv /opt/apache-tomcat-${TOMCAT_VERSION} $CATALINA_HOME \
-    && rm /tmp/tomcat.tar.gz
-
-# Copiar script de inicialização
+# Copia o script de inicialização customizado
 COPY entrypoint.sh /entrypoint.sh
-RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh
 
+# Dá permissão de execução ao script
+RUN chmod +x /entrypoint.sh
+
+# Expõe a porta padrão do Tomcat
 EXPOSE 8080
 
+# Usa o entrypoint customizado
 ENTRYPOINT ["/entrypoint.sh"]
