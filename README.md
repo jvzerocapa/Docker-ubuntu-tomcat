@@ -1,39 +1,31 @@
 Docker-ubuntu-tomcat
 
-Este repositório contém um Dockerfile e um script entrypoint.sh para configurar e iniciar automaticamente o Apache Tomcat 10 com Java 17 em um contêiner Docker.
+Este repositório contém um Dockerfile e um script entrypoint.sh para configurar e iniciar automaticamente o Apache Tomcat em um contêiner Docker com JDK 17.
 
 🚀 Funcionalidade
 
-Usa imagem oficial do Tomcat 10 com Java 17.
+Instalação do Apache Tomcat.
 
 Configuração do Tomcat com usuário administrador (admin / admin).
 
 Configuração do acesso remoto ao Tomcat Manager e Host Manager.
 
-Início automático do Tomcat em segundo plano via entrypoint.sh.
+Instalação de dependências Java necessárias para conexão a bancos de dados.
 
-Instalação de dependências necessárias para que aplicações Java se conectem a bancos de dados.
+Início automático do Tomcat em segundo plano.
 
 🛠️ Arquivos
 
-Dockerfile: Define a imagem Docker baseada no Tomcat oficial, copia o entrypoint.sh, dá permissão de execução e expõe a porta 8080.
+Dockerfile: Define a imagem Docker com base no Tomcat 10 + JDK 17, copia o script de inicialização customizado e expõe as portas.
 
-entrypoint.sh: Script de inicialização que:
-
-Copia os apps manager e host-manager se não existirem.
-
-Cria o usuário admin com acesso total.
-
-Libera o acesso remoto aos apps manager e host-manager.
-
-Instala dependências do Java necessárias para conexão a bancos.
-
-Inicia o Tomcat.
-
-⚠️ Se você precisar usar outra versão do Tomcat ou Java, basta alterar a linha FROM tomcat:10.1-jdk17 no Dockerfile para a versão desejada.
+entrypoint.sh: Script que configura o Tomcat, cria o usuário administrador, libera acesso remoto e inicia o Tomcat.
 
 📦 Como Usar
-Opção 1 – Build manual da imagem
+Opção 1: Usar a imagem já disponível no Docker Hub
+docker pull joaovitorgomes12/tomcatmanager:10.1-jdk17
+docker run -d -p 80:8080 --name tomcat joaovitorgomes12/tomcatmanager:10.1-jdk17
+
+Opção 2: Buildar localmente
 
 Clone o repositório:
 
@@ -48,24 +40,16 @@ docker build -t ubuntu-tomcat .
 
 Execute o contêiner:
 
-docker run -d -p 8080:8080 --name tomcat ubuntu-tomcat
+docker run -d -p 80:8080 --name tomcat ubuntu-tomcat
 
-Opção 2 – Usando imagem pronta do Docker Hub
+🌐 Acesso ao Tomcat
 
-Você pode usar diretamente a imagem pronta no Docker Hub, sem precisar buildar:
-
-docker pull joaovitorgomes12/tomcatmanager:10.1-jdk17
-docker run -d -p 8080:8080 --name tomcat joaovitorgomes12/tomcatmanager:10.1-jdk17
-
-
-Acesse o Tomcat:
-
-URL: http://localhost:8080
+Tomcat Manager: http://<host>/manager/html
 
 Usuário: admin
 
 Senha: admin
 
-🔐 Acesso Remoto
+🔄 Alterar versão do Tomcat / JDK
 
-O acesso ao Tomcat Manager e Host Manager foi configurado para permitir conexões remotas. Certifique-se de que sua rede e firewall permitam acesso à porta 8080.
+Se precisar de outra versão, basta alterar a linha FROM tomcat:10.1-jdk17 no Dockerfile para a versão desejada.
